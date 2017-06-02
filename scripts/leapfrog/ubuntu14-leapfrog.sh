@@ -16,7 +16,7 @@
 # (c) 2017, Jean-Philippe Evrard <jean-philippe.evrard@rackspace.co.uk>
 
 ## Shell Opts ----------------------------------------------------------------
-set -e -u -x
+set -e -u
 set -o pipefail
 
 ## Base dir ------------------------------------------------------------------
@@ -46,8 +46,8 @@ export LEAPFROG_DIR=${LEAPFROG_DIR:-"/opt/rpc-leapfrog"}
 export OA_OPS_REPO=${OA_OPS_REPO:-'https://github.com/openstack/openstack-ansible-ops.git'}
 # Please bump the following when a patch for leapfrog is merged into osa-ops
 # If you are developping, just clone your ops repo into (by default)
-# /opc/rpc-leapfrog/osa-ops-leapfrog
-export OA_OPS_REPO_BRANCH=${OA_OPS_REPO_BRANCH:-'9d282388acca24f18fd00c529a1cdf7e69f54812'}
+# /opc/rpc-leapfrog/openstack-ansible-ops
+export OA_OPS_REPO_BRANCH=${OA_OPS_REPO_BRANCH:-'c1a4219a5ac9f634afae695be8d6dea0e1e31059'}
 # Instead of storing the debug's log of run in /tmp, we store it in an
 # folder that will get archived for gating logs
 export DEBUG_PATH="/var/log/osa-leapfrog-debug.log"
@@ -76,6 +76,7 @@ fi
 
 ### Main ----------------------------------------------------------------------
 if [[ "${IS_GATING}" == "TRUE" ]]; then
+    set -x
     # force the skip of the input validation.
     export VALIDATE_UPGRADE_INPUT=False
     export AUTOMATIC_VAR_MIGRATE_FLAG="--for-testing-take-new-vars-only"
@@ -95,9 +96,9 @@ fi
 pushd ${LEAPFROG_DIR}
 
     # Get the OSA LEAPFROG
-    if [[ ! -d "osa-ops-leapfrog" ]]; then
-        git clone ${OA_OPS_REPO} osa-ops-leapfrog
-        pushd osa-ops-leapfrog
+    if [[ ! -d "openstack-ansible-ops" ]]; then
+        git clone ${OA_OPS_REPO}
+        pushd openstack-ansible-ops
             git checkout ${OA_OPS_REPO_BRANCH}
         popd
         log "clone" "ok"
@@ -123,7 +124,7 @@ pushd ${LEAPFROG_DIR}
     # Now the following directory structure is in place
     # /opt
     #     /rpc-leapfrog
-    #                  /osa-ops-leapfrog # contains osa ops complete repo
+    #                  /openstack-ansible-ops    # contains osa ops full repo
     #                  /rpc-openstack.pre-newton # contains old
     #                                            # /opt/rpc-openstack
     #     /rpc-openstack # contains rpc-openstack newton tooling
@@ -149,7 +150,7 @@ pushd ${LEAPFROG_DIR}
     fi
 
     if [[ ! -f "${UPGRADE_LEAP_MARKER_FOLDER}/osa-leap.complete" ]]; then
-        pushd osa-ops-leapfrog/leap-upgrades/
+        pushd openstack-ansible-ops/leap-upgrades/
             export REDEPLOY_EXTRA_SCRIPT=${RPCO_DEFAULT_FOLDER}/scripts/leapfrog/pre_redeploy.sh
             . ./run-stages.sh
         popd
@@ -160,7 +161,7 @@ pushd ${LEAPFROG_DIR}
     # Now the following directory structure is in place
     # /opt
     #     /rpc-leapfrog
-    #                  /osa-ops-leapfrog # contains osa ops complete repo
+    #                  /openstack-ansible-ops    # contains osa ops full repo
     #                  /rpc-openstack.pre-newton # contains old
     #                                            # /opt/rpc-openstack
     #     /rpc-openstack     # contains rpc-openstack newton tooling
@@ -179,7 +180,7 @@ pushd ${LEAPFROG_DIR}
     # Now the following directory structure is in place
     # /opt
     #     /rpc-leapfrog
-    #                  /osa-ops-leapfrog         # contains osa ops
+    #                  /openstack-ansible-ops    # contains osa ops
     #                                            # complete repo
     #                  /rpc-openstack.pre-newton # contains old
     #                                            # /opt/rpc-openstack
