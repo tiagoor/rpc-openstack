@@ -46,6 +46,22 @@
   when: "'xxx' in '{{ item.split(' ')[-1] }}'"
   with_items: neutron_output.stdout_lines|default([])
 
+- name: Grab relevant output of neutron port-list
+  shell: |
+    . ~/openrc
+    neutron port-list -c id -c binding:host_id -c device_owner -c status -f value
+  register: neutron_port_output
+  failed_when: "neutron_port_output.rc != 0"
+
+- name: Display output of neutron port-list
+  debug: var=neutron_port_output
+
+- name: Fail if any of the neutron ports are in the BUILD state
+  fail:
+    msg: "One or more of the neutron ports are in the build state. Check the output above for more detail."
+  when: "'build' in '{{ item.split(' ')[-1]|lower }}'"
+  with_items: "{{ neutron_port_output.stdout|default([]) }}"
+
 # Note: As part of https://github.com/rcbops/u-suk-dev/issues/348,
 # it has been realized that cinder services with the old hostname
 # cannot be deleted. Because of this, any services

@@ -32,6 +32,10 @@ neutron agent-list output as at {{ ansible_date_time.date }}-{{ ansible_date_tim
 {{ line }}
 {% endfor %}
 
+neutron DHCP port list as at {{ ansible_date_time.date }}-{{ ansible_date_time.time }}
+{% for line in neutron_port_result.stdout_lines %}
+{{ line }}
+{% endfor %}
 
 openstack endpoint list output as at {{ ansible_date_time.date }}-{{ ansible_date_time.time }}
 Compare output to external_lb_vip_address: {{ external_lb_vip_address }}

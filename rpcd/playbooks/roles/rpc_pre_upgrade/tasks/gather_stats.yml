@@ -65,6 +65,13 @@
   register: instance_volume_mappings_result
   delegate_to: "{{ groups['galera_all'][0] }}"
 
+- name: Gather Neutron DHCP ports
+  shell: "source ~/openrc && neutron port-list -c id -c status -c fixed_ips -c binding:host_id -c device_owner |grep dhcp"
+  args:
+    executable: /bin/bash
+  register: neutron_port_result
+  delegate_to: "{{ groups['utility_all'][0] }}"
+
 - name: Output into text file
   template:
     src: "{{ item }}.txt.j2"
