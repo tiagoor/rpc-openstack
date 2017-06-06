@@ -42,6 +42,9 @@ openstack-ansible -vvv ${BASE_DIR}/scripts/bootstrap-aio.yml \
                   -i "localhost," -c local \
                   -e "${BOOTSTRAP_OPTS}"
 
+# Bootstrap ironic as well
+openstack-ansible -vvv ${BASE_DIR}/scripts/bootstrap-ironic.yml -i "localhost," -c local
+
 if ! apt_artifacts_available; then
   # Remove the AIO configuration relating to the use
   # of apt artifacts. This needs to be done because

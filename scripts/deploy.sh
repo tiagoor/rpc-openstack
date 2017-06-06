@@ -78,6 +78,10 @@ if [[ "${DEPLOY_MAGNUM}" == "yes" ]]; then
   run_ansible ${BASE_DIR}/contrib/octavia/playbook.yml
 fi
 
+if [["${DEPLOY_IRONIC}" == "yes" ]]; then
+  openstack-ansible -vvv ${BASE_DIR}/scripts/bootstrap-ironic.yml -i "localhost," -c local
+fi
+
 # update the RPC-O secrets
 bash ${BASE_DIR}/scripts/update-secrets.sh
 
