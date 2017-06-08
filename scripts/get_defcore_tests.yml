@@ -1,5 +1,5 @@
 ---
-# Copyright 2016, Rackspace US, Inc.
+# Copyright 2015, Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The release tag to use
-# Note that this is set here so that the openstack_release override in osa_defaults
-# is able to use it.
-rpc_release: "r15.0.0rc1"
+- name: Get defcore test list from defcore repo
+  get_url:
+    url: "{{ defcore_url }}"
+    dest: "/opt/defcore_tempest_list_{{ version_number }}"
+  delegate_to: localhost
 
+- name: Set fact for defcore json file
+  set_fact:
+    defcore_json_file: "{{ lookup('file', '/opt/defcore_tempest_list_'~version_number) | from_json }}"
+  
+- name: Set fact for defcore tests
+  set_fact:
+    defcore_tests: "{{ defcore_tests|default([]) + item.tests.keys() }}"
+  with_items: "{{ defcore_json_file['capabilities'].values() }}"
